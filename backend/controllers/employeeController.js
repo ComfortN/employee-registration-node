@@ -23,3 +23,16 @@ exports.addEmployee = async (req, res) => {
     }
 };
 
+
+exports.updateEmployee = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name, email, phone, position } = req.body;
+        await db.collection('employees').doc(id).update({
+            name, email, phone, position
+        });
+        res.json({ message: 'Employee updated successfully' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}

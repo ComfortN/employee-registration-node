@@ -13,20 +13,21 @@ const router = express.Router();
 
 router.get('/', employeeController.getAllEmployees);
 router.post('/', employeeController.addEmployee);
+router.put('/:id', employeeController.updateEmployee);
 
 
 app.use('/api/employees', router);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ error: 'Something went wrong!' });
+    console.error(err.stack);
+    res.status(500).json({ error: 'Something went wrong!' });
 });
 
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+    console.log(`Server running on port ${PORT}`);
 });
 
 module.exports = app;
