@@ -9,6 +9,7 @@ import Home from './components/home/home';
 import Login from './components/login/login';
 import Modal from './components/model/Modal';
 import Loader from './components/Loader/Loader';
+import axios from 'axios';
 
 
 function App() {
@@ -24,8 +25,9 @@ function App() {
   const [isEditing, setIsEditing] = useState(false);
   const [viewOnly, setViewOnly] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [initialise, setInitialse] = useState(false);
+  // const [initialise, setInitialse] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
 
   const adminDetails = {
@@ -35,32 +37,54 @@ function App() {
   };
   
 
-  useEffect(() => {
-    const storedAuth = localStorage.getItem('isAuthenticated') === 'true';
-    setIsAuthenticated(storedAuth);
+  // useEffect(() => {
+  //   const storedAuth = localStorage.getItem('isAuthenticated') === 'true';
+  //   setIsAuthenticated(storedAuth);
 
-    const storedEmployees = localStorage.getItem('employees');
-    const storedFormerEmployees = localStorage.getItem('formerEmployees');
-    if (storedEmployees) {
-      console.log('Loaded employees from localStorage:', JSON.parse(storedEmployees));
-      setEmployees(JSON.parse(storedEmployees));
+  //   const storedEmployees = localStorage.getItem('employees');
+  //   const storedFormerEmployees = localStorage.getItem('formerEmployees');
+  //   if (storedEmployees) {
+  //     console.log('Loaded employees from localStorage:', JSON.parse(storedEmployees));
+  //     setEmployees(JSON.parse(storedEmployees));
+  //   }
+  //   if (storedFormerEmployees) {
+  //     console.log('Loaded former employees from localStorage:', JSON.parse(storedFormerEmployees));
+  //     setFormerEmployees(JSON.parse(storedFormerEmployees));
+  //   }
+
+  //   setInitialse(true);
+  // }, []);
+
+  // useEffect(() => {
+  //   setTimeout(() => {
+  //   console.log('Saving employees to localStorage:', employees);
+  //   localStorage.setItem('isAuthenticated', isAuthenticated.toString());
+  //   localStorage.setItem('employees', JSON.stringify(employees));
+  //   localStorage.setItem('formerEmployees', JSON.stringify(formerEmployees));
+  //   },1);
+  // }, [isAuthenticated, employees, formerEmployees]);
+
+    useEffect(() => {
+    if (isAuthenticated) {
+      fetchEmployees();
     }
-    if (storedFormerEmployees) {
-      console.log('Loaded former employees from localStorage:', JSON.parse(storedFormerEmployees));
-      setFormerEmployees(JSON.parse(storedFormerEmployees));
+  }, [isAuthenticated]);
+
+  const fetchEmployees = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get('http://localhost:5000/api/employees', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      setEmployees(response.data);
+      setLoading(false);
+    } catch (err) {
+      setError('Failed to fetch employees');
+      setLoading(false);
     }
-
-    setInitialse(true);
-  }, []);
-
-  useEffect(() => {
-    setTimeout(() => {
-    console.log('Saving employees to localStorage:', employees);
-    localStorage.setItem('isAuthenticated', isAuthenticated.toString());
-    localStorage.setItem('employees', JSON.stringify(employees));
-    localStorage.setItem('formerEmployees', JSON.stringify(formerEmployees));
-    },1);
-  }, [isAuthenticated, employees, formerEmployees]);
+  };
 
   const handleLogin = () => {
     setIsAuthenticated(true);
@@ -106,9 +130,9 @@ function App() {
   };
 
 
-  if(!initialise) {
-    return <div>Loading...</div>
-  }
+  // if(!initialise) {
+  //   return <div>Loading...</div>
+  // }
 
 
 

@@ -1,4 +1,5 @@
 import React, {useState, useEffect} from 'react';
+import axios from 'axios';
 import Popup from '../popup/Popup';
 import './AddEmployee.css'
 
@@ -65,7 +66,7 @@ export default function AddEmployee({addEmployee, updateEmployee, isEditing, onD
         }
     };
     
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         if (validate()) {
             if (isEditing) {
@@ -73,7 +74,8 @@ export default function AddEmployee({addEmployee, updateEmployee, isEditing, onD
                 setIsEditing(false);
                 showAlert('Employee updated successfully!');
             } else {
-                addEmployee(employee);
+                // addEmployee(employee);
+                await axios.post('http://localhost:5000/api/employees', employee);
                 showAlert('Employee added successfully!');
             }
             setEmployee({
