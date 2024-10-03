@@ -70,7 +70,8 @@ export default function AddEmployee({addEmployee, updateEmployee, isEditing, onD
         e.preventDefault();
         if (validate()) {
             if (isEditing) {
-                updateEmployee(employee);
+                // updateEmployee(employee);
+                await axios.put(`http://localhost:5000/api/employees/${employee.id}`, employee);
                 setIsEditing(false);
                 showAlert('Employee updated successfully!');
             } else {
