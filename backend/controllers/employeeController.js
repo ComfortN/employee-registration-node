@@ -36,3 +36,36 @@ exports.updateEmployee = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 }
+
+
+exports.deleteEmployee = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const employeeDoc = await db.collection('employees').doc(id).get();
+        if (!employeeDoc.exists) {
+            return res.status(404).json({ error: 'Employee not found' });
+        }
+        const employeeData = employeeDoc.data();
+
+        // Add to former employees collection
+        await db.collection('formerEmployees').doc(id).set(employeeData);
+
+        // Delete from current employees collection
+        await db.collection('employees').doc(id).delete();
+
+        res.json({ message: 'Employee moved to former employees successfully' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}
+
+
+exports.getAllFormerEmployees = async (req, res) => {
+    try {
+        const snapshot = await db.collection('formerEmployees').get();
+        const formerEmployees = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        res.json(formerEmployees);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}

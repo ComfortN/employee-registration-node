@@ -14,6 +14,8 @@ const router = express.Router();
 router.get('/', employeeController.getAllEmployees);
 router.post('/', employeeController.addEmployee);
 router.put('/:id', employeeController.updateEmployee);
+router.delete('/:id', employeeController.deleteEmployee);
+router.get('/former', employeeController.getAllFormerEmployees);
 
 
 app.use('/api/employees', router);
