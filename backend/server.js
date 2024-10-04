@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const employeeController = require('./controllers/employeeController');
+const authMiddleware = require('./middleware/auth');
 
 const app = express();
 
@@ -9,6 +10,8 @@ app.use(express.json());
 
 // Employee routes
 const router = express.Router();
+
+router.use(authMiddleware);
 
 
 router.get('/', employeeController.getAllEmployees);
