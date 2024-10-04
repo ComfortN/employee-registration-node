@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import './App.css';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from './firebase/firebase';
 import AddEmployee from './components/add-employee/AddEmployee';
 import AllEmployees from './components/all-employees/AllEmp';
 import Header from './components/global/Header';
@@ -64,19 +66,27 @@ function App() {
   //   },1);
   // }, [isAuthenticated, employees, formerEmployees]);
 
-    useEffect(() => {
-    if (isAuthenticated) {
-      fetchEmployees();
-      fetchFormerEmployees();
-    }
-  }, [isAuthenticated]);
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setIsAuthenticated(true);
+        fetchEmployees();
+        fetchFormerEmployees();
+      } else {
+        setIsAuthenticated(false);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   const fetchEmployees = async () => {
     setLoading(true);
     try {
+      const token = await auth.currentUser.getIdToken();
       const response = await axios.get('http://localhost:5000/api/employees', {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${token}`
         }
       });
       setEmployees(response.data);
@@ -90,7 +100,12 @@ function App() {
 
   const fetchFormerEmployees = async () => {
     try {
-        const response = await axios.get('http://localhost:5000/api/employees/former');
+      const token = await auth.currentUser.getIdToken();
+      const response = await axios.get('http://localhost:5000/api/employees/former', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+    });
         setFormerEmployees(response.data);
     } catch (error) {
         console.error('Failed to fetch former employees:', error);
@@ -103,11 +118,17 @@ function App() {
   
 
 
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-    localStorage.removeItem('isAuthenticated');
-    localStorage.removeItem('employees');
-    localStorage.removeItem('formerEmployees');
+  const handleLogout = async () => {
+    // setIsAuthenticated(false);
+    // localStorage.removeItem('isAuthenticated');
+    // localStorage.removeItem('employees');
+    // localStorage.removeItem('formerEmployees');
+    try {
+      await auth.signOut();
+      setIsAuthenticated(false);
+    } catch (error) {
+      console.error('Failed to log out:', error);
+    }
   }
 
 

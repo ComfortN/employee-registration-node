@@ -1,4 +1,6 @@
 import { useNavigate } from 'react-router-dom';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../../firebase/firebase';
 import './login.css'
 import Popup from '../popup/Popup';
 import React, {useState} from 'react';
@@ -7,32 +9,51 @@ import React, {useState} from 'react';
 
 export default function Login({onLogin, setLoading}) {
   const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [popupMessage, setPopupMessage] = useState('');
   const [showPopup, setShowPopup] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = () => {
-  const storedUsername = 'admin'
-  const storedPassword = 'admin123';
+  // const handleLogin = () => {
+  // const storedUsername = 'admin'
+  // const storedPassword = 'admin123';
 
-  setLoading(true);
+  // setLoading(true);
 
-  setTimeout(() => {
+  // setTimeout(() => {
 
-  if (username === storedUsername && password === storedPassword) {
-    showAlert('Login successfully!..');
+  // if (username === storedUsername && password === storedPassword) {
+  //   showAlert('Login successfully!..');
+  //     setTimeout(() => {
+  //       onLogin();
+  //       navigate('/')
+  //     }, 2000);
+     
+  // } else {
+  //     setError('Invalid username or password');
+  //   }
+  //   setLoading(false);
+  //   },  2000);
+  // };
+
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      showAlert('Login successful!');
       setTimeout(() => {
         onLogin();
-        navigate('/')
+        navigate('/');
       }, 2000);
-     
-  } else {
-      setError('Invalid username or password');
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
-    },  2000);
   };
 
 
@@ -62,7 +83,7 @@ export default function Login({onLogin, setLoading}) {
             {error && <p className="error">{error}</p>}
             
             <form className='theForm'  onSubmit={(e) => { e.preventDefault(); handleLogin(); }}>
-                <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="USERNAME" required />
+                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="EMAIL" required />
                 <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="PASSWORD" required/>
                 <button onClick={handleLogin} className="opacity">SUBMIT</button>
             </form>
