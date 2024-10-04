@@ -69,6 +69,8 @@ export default function AddEmployee({addEmployee, updateEmployee, isEditing, onD
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (validate()) {
+            // setLoading(true);
+            try {
             if (isEditing) {
                 // updateEmployee(employee);
                 await axios.put(`http://localhost:5000/api/employees/${employee.id}`, employee);
@@ -88,14 +90,18 @@ export default function AddEmployee({addEmployee, updateEmployee, isEditing, onD
                 id: ''
             });
             setImagePreview('default-avatar.png');
+        } catch (error) {
+            showAlert(`Error: ${error.response?.data?.error || 'Something went wrong'}`);
+        } 
         }
     };
 
 
-    const handleDelete = (employee) => {
+    const handleDelete = async (employee) => {
         const isConfirmed = window.confirm(`Are you sure you want to delete employee ${employee.name}?`);
         if (isConfirmed) {
-            onDelete(employee);
+            // onDelete(employee);
+            await axios.delete(`http://localhost:5000/api/employees/${employee.id}`);
             showAlert('Employee deleted successfully! Moved to Former.');
         }
     };

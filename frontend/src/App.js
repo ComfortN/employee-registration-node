@@ -67,6 +67,7 @@ function App() {
     useEffect(() => {
     if (isAuthenticated) {
       fetchEmployees();
+      fetchFormerEmployees();
     }
   }, [isAuthenticated]);
 
@@ -83,6 +84,16 @@ function App() {
     } catch (err) {
       setError('Failed to fetch employees');
       setLoading(false);
+    }
+  };
+
+
+  const fetchFormerEmployees = async () => {
+    try {
+        const response = await axios.get('http://localhost:5000/api/employees/former');
+        setFormerEmployees(response.data);
+    } catch (error) {
+        console.error('Failed to fetch former employees:', error);
     }
   };
 
