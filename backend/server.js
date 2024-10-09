@@ -11,7 +11,7 @@ app.use(express.json());
 // Employee routes
 const router = express.Router();
 
-router.use(authMiddleware);
+// router.use(authMiddleware);
 
 
 router.get('/', employeeController.getAllEmployees);
